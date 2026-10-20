@@ -1,0 +1,13 @@
+name: NL-UniversePVP
+version: 1.0.0
+main: nl.universe.pvp.PvPPlugin
+api-version: '1.21.11'
+softdepend: [Multiverse-Core, Multiverse-Inventories]
+commands:
+  nlpvp:
+    aliases: [pvpclass]
+    description: PvP classes and duels
+    usage: /nlpvp
+permissions:
+  nluniversepvp.admin:
+    default: op
