@@ -32,13 +32,30 @@ jobs:
         with:
           gradle-version: '8.14.3'
 
+      - name: Find Gradle project
+        id: project
+        shell: bash
+        run: |
+          BUILD_FILE=$(find . -type f -name "build.gradle" -not -path "*/.gradle/*" -print -quit)
+
+          if [ -z "$BUILD_FILE" ]; then
+            echo "ERROR: build.gradle not found!"
+            find . -maxdepth 4 -type f
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$BUILD_FILE")
+          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          echo "Found Gradle project: $PROJECT_DIR"
+
       - name: Build NL-UniversePVP
+        working-directory: ${{ steps.project.outputs.dir }}
         run: gradle clean build --no-daemon
 
       - name: Upload plugin JAR
         uses: actions/upload-artifact@v4
         with:
           name: NL-UniversePVP
-          path: build/libs/*.jar
+          path: ${{ steps.project.outputs.dir }}/build/libs/*.jar
           if-no-files-found: error
           retention-days: 30
