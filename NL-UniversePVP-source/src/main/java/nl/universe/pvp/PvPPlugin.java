@@ -34,8 +34,29 @@ public final class PvPPlugin extends JavaPlugin implements Listener, CommandExec
   private boolean isClass(String c){return queues.containsKey(c);}
   private boolean admin(CommandSender s){if(!s.hasPermission("nluniversepvp.admin")){s.sendMessage("§cGeen toestemming.");return false;}return true;}
   @Override public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args){
-    if(args.length==0){sender.sendMessage("§e/nlpvp menu | leave | save <class> | sethub | status");return true;}
+    if(args.length==0){sender.sendMessage("§e/nlpvp menu | openmenu | leave | save <class> | sethub | status");return true;}
     String sub=args[0].toLowerCase(Locale.ROOT);
+    if(sub.equals("openmenu")){
+      if(!(sender instanceof BlockCommandSender blockSender)){
+        sender.sendMessage("§cGebruik dit commando vanuit de PvP JOIN-commandblock.");
+        return true;
+      }
+      Location origin=blockSender.getBlock().getLocation().add(0.5,0.5,0.5);
+      Player nearest=null;
+      double closest=25.0;
+      for(Player candidate:origin.getWorld().getPlayers()){
+        if(candidate.getGameMode()==GameMode.SPECTATOR)continue;
+        double distance=candidate.getLocation().distanceSquared(origin);
+        if(distance<=closest){closest=distance;nearest=candidate;}
+      }
+      if(nearest==null){sender.sendMessage("§eGeen speler binnen 5 blokken.");return true;}
+      if(matches.containsKey(nearest.getUniqueId())){
+        nearest.sendMessage("§cJe zit al in een wedstrijd.");return true;
+      }
+      leaveQueue(nearest);
+      openClass(nearest);
+      return true;
+    }
     if(sub.equals("menu")){if(!(sender instanceof Player p))return true;if(matches.containsKey(p.getUniqueId())){p.sendMessage("§cJe zit in een wedstrijd.");return true;}leaveQueue(p);openClass(p);return true;}
     if(sub.equals("leave")){if(!(sender instanceof Player p))return true; if(matches.containsKey(p.getUniqueId())){end(matches.get(p.getUniqueId()),p.getUniqueId());}else {leaveQueue(p);restore(p);hub(p);}return true;}
     if(sub.equals("save")&&args.length==2){if(!admin(sender))return true;if(!(sender instanceof Player p))return true;String c=args[1].toLowerCase(Locale.ROOT);if(!isClass(c)){p.sendMessage("§cOnbekende class.");return true;}kits.set(c+".inventory",Arrays.asList(p.getInventory().getStorageContents()));kits.set(c+".armor",Arrays.asList(p.getInventory().getArmorContents()));kits.set(c+".offhand",p.getInventory().getItemInOffHand());try{kits.save(kitFile);}catch(IOException e){getLogger().severe(e.getMessage());}p.sendMessage("§aClass "+c+" opgeslagen!");return true;}
