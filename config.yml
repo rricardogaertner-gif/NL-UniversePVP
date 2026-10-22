@@ -1,0 +1,8 @@
+hub-world: nluniverse_hub
+pvp-portal-world: pvp
+arena-size: 100
+max-active-matches: 5
+arena-y: 90
+countdown-seconds: 5
+ffa-world: nlu_ffa
+ffa-built: false
