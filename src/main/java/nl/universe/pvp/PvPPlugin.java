@@ -103,7 +103,13 @@ public final class PvPPlugin extends JavaPlugin implements Listener, CommandExec
     if(!kits.contains(c+".inventory")){p.sendMessage("§cDeze class is nog niet ingesteld door een beheerder.");return;}
     leaveQueue(p);
     World w=Bukkit.getWorld(ffaWorldName);
-    if(w==null){w=Bukkit.createWorld(new WorldCreator(ffaWorldName).type(WorldType.FLAT).generatorSettings("{\"layers\":[{\"block\":\"minecraft:air\",\"height\":1}],\"biome\":\"minecraft:plains\"}")));}
+    if (w == null) {
+    WorldCreator creator = new WorldCreator(ffaWorldName);
+    creator.type(WorldType.FLAT);
+    creator.generatorSettings("{\"layers\":[{\"block\":\"minecraft:air\",\"height\":1}],\"biome\":\"minecraft:plains\"}");
+    w = Bukkit.createWorld(creator);
+    }
+
     if(w==null){p.sendMessage("§cKon FFA-wereld niet maken.");return;}
     if(!getConfig().getBoolean("ffa-built",false)){
       build(w,"warrior");getConfig().set("ffa-built",true);saveConfig();
